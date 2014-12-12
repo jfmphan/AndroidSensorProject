@@ -110,7 +110,7 @@ public class INF133 extends ActionBarActivity{
     @Override
     protected void onResume(){
         super.onResume();
-        sensorManager.registerListener(acc, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(acc, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_UI);
         // register the listener
     }
 
@@ -150,35 +150,37 @@ public class INF133 extends ActionBarActivity{
                 dX = x[1] - x[0];
                 dY = y[1] - y[0];
                 dZ = z[1] - z[0];
-                updateUI();
+
 
                 double n = greatest(dX, dY, dZ);
 
+                updateUI();
+
                 if(dX == n)
                 {
-                    if(dX > 1){
+                    if(dX > 1.5){
                         playAudio(afd1);
                     }
-                    else if(dX < -1){
+                    else if(dX < -1.5){
                         playAudio(afd2);
                     }
                 }
                 else if(dY == n)
                 {
-                    if(dY > 1){
+                    if(dY > 1.5){
                         playAudio(afd3);
                     }
-                    else if(dY < - 1){
+                    else if(dY < -1.5){
                         playAudio(afd4);
                     }
                 }
 
                 else if(dZ == n)
                 {
-                    if(dZ > 1){
+                    if(dZ > 1.5){
                         playAudio(afd5);
                     }
-                    else if(dZ < -1){
+                    else if(dZ < -1.5){
                         playAudio(afd6);
                     }
                 }
