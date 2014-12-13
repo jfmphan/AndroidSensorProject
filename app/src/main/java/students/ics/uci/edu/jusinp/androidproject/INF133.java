@@ -9,13 +9,12 @@ import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 
 public class INF133 extends ActionBarActivity{
@@ -28,13 +27,11 @@ public class INF133 extends ActionBarActivity{
     private AssetFileDescriptor afd5;
     private AssetFileDescriptor afd6;
     private SensorManager sensorManager;
-    private SensorEventListener acc;
+    private SensorEventListener orientationS;
     private TextView textField01;
+    private TextView textField02;
+    private TextView textField03;
 
-
-    private double[] x = new double[2];
-    private double[] y = new double[2];
-    private double[] z = new double[2];
     private double dX;
     private double dY;
     private double dZ;
@@ -45,35 +42,14 @@ public class INF133 extends ActionBarActivity{
 
             @Override
             public void run(){
-                textField01.setText("x : " + dX + " y: " + dY + " z: " + dZ);
+
+                DecimalFormat df = new DecimalFormat("##.##");
+                textField01.setText("x : " + df.format(dX));
+                textField02.setText("y : " + df.format(dY));
+                textField03.setText("z : " + df.format(dZ));
             }
         });
 
-    }
-
-    private double greatest(double x, double y, double z)
-    {
-        double greatest = 0;
-
-        double dx = Math.abs(x);
-        double dy = Math.abs(y);
-        double dz = Math.abs(z);
-
-        if(dx > dy)
-        {
-            greatest = x;
-        }
-        else
-        {
-            greatest = y;
-        }
-
-        if(greatest < dz)
-        {
-            greatest = z;
-        }
-
-        return greatest;
     }
 
 
@@ -110,14 +86,14 @@ public class INF133 extends ActionBarActivity{
     @Override
     protected void onResume(){
         super.onResume();
-        sensorManager.registerListener(acc, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(orientationS, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
         // register the listener
     }
 
     @Override
     protected void onStop(){
         // unregister the listener
-        sensorManager.unregisterListener(acc);
+        sensorManager.unregisterListener(orientationS);
         super.onStop();
     }
 
@@ -127,63 +103,42 @@ public class INF133 extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inf133);
         textField01 = (TextView) findViewById(R.id.textView);
-
-
-        z[1] = 0;
-        y[1] = 0;
-        x[1] = 0;
+        textField02 = (TextView) findViewById(R.id.textView2);
+        textField03 = (TextView) findViewById(R.id.textView3);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        acc = new SensorEventListener() {
+        orientationS = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
 
-
-                z[0] = z[1];
-                y[0] = y[1];
-                x[0] = x[1];
-
-                z[1] = event.values[0];
-                y[1] = event.values[1];
-                x[1] = event.values[2];
-
-                dX = x[1] - x[0];
-                dY = y[1] - y[0];
-                dZ = z[1] - z[0];
-
-
-                double n = greatest(dX, dY, dZ);
-
+                dZ = event.values[0];
+                dX = event.values[1];
+                dY = event.values[2];
                 updateUI();
 
-                if(dX == n)
+                if(dZ > 310 && dZ < 330)
                 {
-                    if(dX > 1.5){
-                        playAudio(afd1);
-                    }
-                    else if(dX < -1.5){
-                        playAudio(afd2);
-                    }
+                    playAudio(afd1);
                 }
-                else if(dY == n)
+                else if(dZ > 140 && dZ < 155)
                 {
-                    if(dY > 1.5){
-                        playAudio(afd3);
-                    }
-                    else if(dY < -1.5){
-                        playAudio(afd4);
-                    }
+                    playAudio(afd2);
+                }
+                else if(dY > 40 && dY < 50)
+                {
+                    playAudio(afd3);
+                }
+                else if(dY < -40 && dY > -50)
+                {
+                    playAudio(afd4);
+                }
+                else if(dX < -150 && dX > -180)
+                {
+                    playAudio(afd5);
                 }
 
-                else if(dZ == n)
-                {
-                    if(dZ > 1.5){
-                        playAudio(afd5);
-                    }
-                    else if(dZ < -1.5){
-                        playAudio(afd6);
-                    }
-                }
+
+
 
             }
 
@@ -203,11 +158,6 @@ public class INF133 extends ActionBarActivity{
 
 
     }
-
-
-
-
-
 
 
     @Override
